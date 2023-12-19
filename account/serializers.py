@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from django.contrib.auth import authenticate    # для проверки есть ли юзер в нашей бд
 
 class RegisterSerializer(serializers.ModelSerializer):
     first_name=serializers.CharField(required=True)
@@ -31,3 +32,45 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
         return user
     
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField() # получаем 
+    password = serializers.CharField()
+
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+        request = self.context.get('request')   # сюда попадает request из views  
+        if username and password:          
+            user = authenticate(                #  для получение таких юзеров
+                username=username,
+                password=password,
+                request=request
+                )
+            if not user:
+                raise serializers.ValidationError(           
+                    'не правильный пароль или юзернейм'
+                )
+        else:
+            raise serializers.ValidationError(
+                'Вы забыли заполнить username или password'
+            )
+        
+        data['user'] = user     #   изменяем значение data под ключом user на новое 
+        return data
+    
+    def validate_username(self, username):    # проверка на того что есть ли такой 
+        if not User.objects.filter(username=username).exists():    # проверка на наличие exsists() возвр бул тип данных
+            raise serializers.ValidationError(
+                'username not found'
+            )
+        return username
+    
+
+
+
+class UserListSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=255)  # Замените на тип вашего поля и его параметры
+
+    class Meta:
+        fields = ('username',)
