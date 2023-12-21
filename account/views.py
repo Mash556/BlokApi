@@ -1,13 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import RegisterSerializer, LoginSerializer, User, UserListSerializer
+from .serializers import RegisterSerializer, LoginSerializer, User, UserSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token               # для работы с токеном 
-from rest_framework.permissions import IsAuthenticated          # для проыверки авторизован ли пользователь
-from rest_framework.generics import ListAPIView
+from rest_framework.authtoken.models import Token            # для работы с токеном 
+from rest_framework.permissions import IsAuthenticated  , IsAdminUser         # для проыверки авторизован ли пользователь
+from rest_framework import generics                # generic это готовая логика которая работает с 
 
 
 class UserRegistration(APIView):
+    """Регистрация на базу"""
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -48,9 +50,19 @@ class LogautView(APIView):    # для удаление токена
 # запрос возвращает всех сущ пользователей  
 
 
-class UserListApiView(ListAPIView):
-    def get(self, request):
-        queryset = User.objects.values('username')
-        serializer = UserListSerializer(queryset, many=True)
-        return Response(serializer.data)
-    
+class UserListApiView(generics.ListAPIView):
+    """Тут хранится список всех user"""
+    queryset = User.objects.values('username')
+    serializer_class = UserSerializer
+
+
+class UserDetailAPIView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class UserDetailAPIView(generics.RetrieveDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'id'
+    permission_classes = [IsAuthenticated, IsAdminUser]
+

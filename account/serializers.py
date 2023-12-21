@@ -3,6 +3,9 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate    # для проверки есть ли юзер в нашей бд
 
 class RegisterSerializer(serializers.ModelSerializer):
+
+    """Это user"""
+
     first_name=serializers.CharField(required=True)
     last_name=serializers.CharField(required=True)
     password=serializers.CharField(required=True, min_length=8, write_only=True)
@@ -69,8 +72,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 
-class UserListSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=255)  # Замените на тип вашего поля и его параметры
-
+class UserSerializer(serializers.Serializer):
     class Meta:
-        fields = ('username',)
+        fields = '__all__'
+        model = User
