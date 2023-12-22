@@ -3,22 +3,33 @@ from rest_framework.viewsets import ModelViewSet
 from .serializers import PostSerializer
 from .models import Post
 
-class PostListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+# class PostListCreateAPIView(generics.ListCreateAPIView):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def perform_create(self, serializer):
-        serializer.save(owner = self.request.user)
+#     def perform_create(self, serializer):
+#         serializer.save(owner = self.request.user)
 
 
-class PostDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = PostSerializer
-    queryset = Post.objects.all()
-    lookup_field = 'id'
-    permission_classes = [permissions.IsAuthenticated]
+# class PostDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     serializer_class = PostSerializer
+#     queryset = Post.objects.all()
+#     lookup_field = 'id'
+#     permission_classes = [permissions.IsAuthenticated]
 
 # надо написать СRUD на ModelViewSet
 # написать FullCRUD на ModelViewSet(Post)
 # n+1 & lazy queryset
     
+class PostModelViewSet(ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(owner = self.request.user)
+
+
+# .filter(title='asdf').all()
+# mixins | generics

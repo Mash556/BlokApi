@@ -1,7 +1,13 @@
-from django.urls import path
+from django.urls import path, include
 from .views import *
+from rest_framework.routers import DefaultRouter
+
+# Создаем экземпляр DefaultRouter
+router = DefaultRouter()
+
+# Регистрируем YourModelViewSet в router
+router.register(r'posts', PostModelViewSet, basename='post')
 
 urlpatterns = [
-    path('<int:id>/', PostDetailAPIView.as_view()),
-    path('', PostListCreateAPIView.as_view())
+    path('', include(router.urls)),
 ]
